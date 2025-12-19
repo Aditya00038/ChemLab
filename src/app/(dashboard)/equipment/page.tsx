@@ -307,108 +307,151 @@ export default function EquipmentPage() {
           </div>
         </CardHeader>
         <CardContent>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredAndSortedEquipment.length > 0 ? (
               filteredAndSortedEquipment.map(item => {
-                const status = equipmentStatus[item.id] || { inUse: 0, available: item.totalQuantity, borrowedByMe: 0 };
-                const checkoutQty = checkoutQuantities[item.id] || 1;
+              const status = equipmentStatus[item.id] || { inUse: 0, available: item.totalQuantity, borrowedByMe: 0 };
+              const checkoutQty = checkoutQuantities[item.id] || 1;
 
-                return (
-                    <Card key={item.id} className={cn("flex flex-col transition-all hover:shadow-lg animate-in fade-in-0 slide-in-from-bottom-4", status.borrowedByMe > 0 && "border-primary")}>
-                        <CardHeader>
-                            <div className="flex justify-between items-start gap-2">
-                                <CardTitle className="text-xl">{item.name}</CardTitle>
-                                <Badge variant={getStatusBadgeVariant(status)}>{getStatusText(status)}</Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{item.category}</p>
-                        </CardHeader>
-                        <CardContent className="flex-grow flex flex-col justify-between gap-4">
-                            <div className="flex justify-around text-center">
-                                <div>
-                                    <p className="text-4xl font-bold">{status.available}</p>
-                                    <p className="text-xs text-muted-foreground">Available</p>
-                                </div>
-                                 <div>
-                                    <p className="text-4xl font-bold">{status.inUse}</p>
-                                    <p className="text-xs text-muted-foreground">In Use</p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                {status.borrowedByMe > 0 && (
-                                    <div className="space-y-2 p-3 rounded-md border border-blue-500/50 bg-blue-500/5">
-                                        <Label htmlFor={`return-${item.id}`} className="text-xs font-medium text-blue-700 dark:text-blue-400">You have {status.borrowedByMe} borrowed</Label>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                id={`return-${item.id}`}
-                                                type="number"
-                                                placeholder="Qty"
-                                                className="h-9 w-20"
-                                                value={returnQuantities[item.id] || ''}
-                                                onChange={e => setReturnQuantities(prev => ({...prev, [item.id]: e.target.value}))}
-                                                min={1}
-                                                max={status.borrowedByMe}
-                                            />
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 h-9"
-                                                onClick={() => handleReturn(item.id)}
-                                                disabled={!returnQuantities[item.id] || parseInt(returnQuantities[item.id] || '0') <= 0}
-                                            >
-                                                <CornerUpLeft className="mr-0 sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Return</span>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="space-y-2">
-                                    <Label htmlFor={`checkout-${item.id}`} className={cn("text-sm font-medium", status.available === 0 && 'text-muted-foreground')}>Checkout Quantity</Label>
-                                    <div className="flex items-center gap-2">
-                                        <Button size="icon" variant="outline" className="h-9 w-9" onClick={() => handleQuantityButtonClick(item.id, -1)} disabled={status.available === 0}><Minus className="h-4 w-4"/></Button>
-                                        <Input
-                                            id={`checkout-${item.id}`}
-                                            type="number"
-                                            className="w-16 text-center h-9"
-                                            value={checkoutQty}
-                                            onChange={e => {
-                                                const val = parseInt(e.target.value);
-                                                if (isNaN(val)) setCheckoutQuantities(prev => ({...prev, [item.id]: 1}));
-                                                else if (val > status.available) {
-                                                    toast({variant: 'destructive', title: `Only ${status.available} units available.`});
-                                                    setCheckoutQuantities(prev => ({...prev, [item.id]: status.available}));
-                                                } else {
-                                                     setCheckoutQuantities(prev => ({...prev, [item.id]: val}));
-                                                }
-                                            }}
-                                            min={1}
-                                            max={status.available}
-                                            disabled={status.available === 0}
-                                        />
-                                        <Button size="icon" variant="outline" className="h-9 w-9" onClick={() => handleQuantityButtonClick(item.id, 1)} disabled={status.available === 0}><Plus className="h-4 w-4"/></Button>
-                                        <Button 
-                                            className="flex-1 h-9"
-                                            onClick={() => handleCheckout(item.id)}
-                                            disabled={status.available === 0 || checkoutQty <= 0}
-                                        >
-                                            <LogIn className="mr-0 sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Checkout</span>
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                         <div className="border-t text-center p-2">
-                             <p className="text-xs text-muted-foreground">
-                                Last used: {new Date(item.lastUsed).toLocaleDateString()}
-                            </p>
-                         </div>
-                    </Card>
-                )
+              // Map equipment name to local image if available, else fallback to Unsplash or placeholder
+              const equipmentImages: Record<string, string> = {
+                'flask': '/media/flask.png',
+                'beaker': '/media/beaker.png',
+                'test tube': '/media/test_tube.png',
+                'pipette': '/media/pipette.png',
+                'burette': '/media/burette.png',
+                'bunsen burner': '/media/bunsen_burner.png',
+                'microscope': '/media/microscope.png',
+                'petri dish': '/media/petri_dish.png',
+                'graduated cylinder': '/media/graduated_cylinder.png',
+                'thermometer': '/media/thermometer.png',
+                'centrifuge': '/media/centrifuge.png',
+                'fume hood': '/media/fume_hood.png',
+              };
+              // Try to match by id or name (case-insensitive)
+              const key = (item.id || item.name || '').toLowerCase();
+              let imageUrl = equipmentImages[key];
+              if (!imageUrl) {
+                // Try partial match
+                for (const k in equipmentImages) {
+                if (key.includes(k)) {
+                  imageUrl = equipmentImages[k];
+                  break;
+                }
+                }
+              }
+              // Fallback to Unsplash or placeholder
+              if (!imageUrl) {
+                imageUrl = `https://source.unsplash.com/400x300/?${encodeURIComponent(item.name + ',lab equipment')}`;
+              }
+
+              return (
+                <Card key={item.id} className={cn("flex flex-col transition-all hover:shadow-lg animate-in fade-in-0 slide-in-from-bottom-4", status.borrowedByMe > 0 && "border-primary")}> 
+                <div className="aspect-video relative bg-muted">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                  src={imageUrl}
+                  alt={item.name}
+                  className="object-contain w-full h-full max-h-48 bg-white border-b"
+                  onError={e => {
+                    (e.currentTarget as HTMLImageElement).src = '/media/app_logo.png';
+                  }}
+                  />
+                </div>
+                <CardHeader>
+                  <div className="flex justify-between items-start gap-2">
+                    <CardTitle className="text-xl">{item.name}</CardTitle>
+                    <Badge variant={getStatusBadgeVariant(status)}>{getStatusText(status)}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{item.category}</p>
+                </CardHeader>
+                <CardContent className="flex-grow flex flex-col justify-between gap-4">
+                  <div className="flex justify-around text-center">
+                    <div>
+                      <p className="text-4xl font-bold">{status.available}</p>
+                      <p className="text-xs text-muted-foreground">Available</p>
+                    </div>
+                     <div>
+                      <p className="text-4xl font-bold">{status.inUse}</p>
+                      <p className="text-xs text-muted-foreground">In Use</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {status.borrowedByMe > 0 && (
+                      <div className="space-y-2 p-3 rounded-md border border-blue-500/50 bg-blue-500/5">
+                        <Label htmlFor={`return-${item.id}`} className="text-xs font-medium text-blue-700 dark:text-blue-400">You have {status.borrowedByMe} borrowed</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id={`return-${item.id}`}
+                            type="number"
+                            placeholder="Qty"
+                            className="h-9 w-20"
+                            value={returnQuantities[item.id] || ''}
+                            onChange={e => setReturnQuantities(prev => ({...prev, [item.id]: e.target.value}))}
+                            min={1}
+                            max={status.borrowedByMe}
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 h-9"
+                            onClick={() => handleReturn(item.id)}
+                            disabled={!returnQuantities[item.id] || parseInt(returnQuantities[item.id] || '0') <= 0}
+                          >
+                            <CornerUpLeft className="mr-0 sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Return</span>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Label htmlFor={`checkout-${item.id}`} className={cn("text-sm font-medium", status.available === 0 && 'text-muted-foreground')}>Checkout Quantity</Label>
+                      <div className="flex items-center gap-2">
+                        <Button size="icon" variant="outline" className="h-9 w-9" onClick={() => handleQuantityButtonClick(item.id, -1)} disabled={status.available === 0}><Minus className="h-4 w-4"/></Button>
+                        <Input
+                          id={`checkout-${item.id}`}
+                          type="number"
+                          className="w-16 text-center h-9"
+                          value={checkoutQty}
+                          onChange={e => {
+                            const val = parseInt(e.target.value);
+                            if (isNaN(val)) setCheckoutQuantities(prev => ({...prev, [item.id]: 1}));
+                            else if (val > status.available) {
+                              toast({variant: 'destructive', title: `Only ${status.available} units available.`});
+                              setCheckoutQuantities(prev => ({...prev, [item.id]: status.available}));
+                            } else {
+                               setCheckoutQuantities(prev => ({...prev, [item.id]: val}));
+                            }
+                          }}
+                          min={1}
+                          max={status.available}
+                          disabled={status.available === 0}
+                        />
+                        <Button size="icon" variant="outline" className="h-9 w-9" onClick={() => handleQuantityButtonClick(item.id, 1)} disabled={status.available === 0}><Plus className="h-4 w-4"/></Button>
+                        <Button 
+                          className="flex-1 h-9"
+                          onClick={() => handleCheckout(item.id)}
+                          disabled={status.available === 0 || checkoutQty <= 0}
+                        >
+                          <LogIn className="mr-0 sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Checkout</span>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                 <div className="border-t text-center p-2">
+                   <p className="text-xs text-muted-foreground">
+                    Last used: {new Date(item.lastUsed).toLocaleDateString()}
+                  </p>
+                 </div>
+                </Card>
+              )
               })
             ) : (
               <div className="col-span-full text-center py-10">
-                <p>No equipment found matching your criteria.</p>
+              <p>No equipment found matching your criteria.</p>
               </div>
             )}
-          </div>
+            </div>
         </CardContent>
       </Card>
       )}

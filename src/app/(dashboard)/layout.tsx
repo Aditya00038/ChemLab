@@ -118,10 +118,11 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen w-full flex-col">
-      {/* Modern Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex h-16 items-center px-4 sm:px-6">
+    <TooltipProvider>
+      <div className="flex h-screen w-full flex-col">
+        {/* Modern Navbar */}
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-16 items-center px-4 sm:px-8 pl-6 sm:pl-10">
           {/* Logo */}
           <Link
             href="/dashboard"
@@ -132,7 +133,7 @@ export default function DashboardLayout({
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 flex-1">
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
             {navItems.map(item => {
               const pathname = usePathname();
               const isActive = pathname === item.href;
@@ -307,11 +308,10 @@ export default function DashboardLayout({
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-muted/40">
         <div className="container mx-auto p-4 sm:p-6 md:p-8">
-          <TooltipProvider>
-            {children}
-          </TooltipProvider>
+          {children}
         </div>
       </main>
     </div>
+    </TooltipProvider>
   );
 }

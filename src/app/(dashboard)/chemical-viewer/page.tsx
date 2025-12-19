@@ -8,7 +8,120 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Search, Loader2, AlertTriangle, Shield, Eye, Info } from "lucide-react";
+import { Search, Loader2, AlertTriangle, Shield, Eye, Info, Beaker, FlaskConical } from "lucide-react";
+import Image from "next/image";
+
+// Lab Equipment with images
+const labEquipment = [
+  {
+    id: "beaker",
+    name: "Laboratory Beaker",
+    description: "Glass vessel with a flat bottom used for mixing, stirring, and heating liquids",
+    category: "Glassware",
+    imageUrl: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=300&fit=crop",
+    uses: ["Mixing solutions", "Heating liquids", "Measuring approximate volumes"],
+    safetyNotes: ["Handle hot beakers with tongs", "Check for cracks before use", "Avoid sudden temperature changes"]
+  },
+  {
+    id: "flask",
+    name: "Erlenmeyer Flask",
+    description: "Conical flask with a narrow neck, ideal for swirling liquids without spillage",
+    category: "Glassware",
+    imageUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?w=400&h=300&fit=crop",
+    uses: ["Titrations", "Recrystallization", "Culturing microorganisms"],
+    safetyNotes: ["Use with heating mantles", "Never heat when sealed", "Allow to cool before handling"]
+  },
+  {
+    id: "test-tube",
+    name: "Test Tube",
+    description: "Small cylindrical container used for holding and mixing small quantities of substances",
+    category: "Glassware",
+    imageUrl: "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=400&h=300&fit=crop",
+    uses: ["Small-scale reactions", "Sample storage", "Qualitative tests"],
+    safetyNotes: ["Use test tube holders when heating", "Point away from yourself and others", "Don't overfill"]
+  },
+  {
+    id: "pipette",
+    name: "Pipette",
+    description: "Precision instrument for measuring and transferring small volumes of liquid",
+    category: "Measurement",
+    imageUrl: "https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=400&h=300&fit=crop",
+    uses: ["Accurate liquid transfer", "Dispensing reagents", "Serial dilutions"],
+    safetyNotes: ["Never pipette by mouth", "Use proper technique", "Calibrate regularly"]
+  },
+  {
+    id: "burette",
+    name: "Burette",
+    description: "Graduated glass tube with a tap at one end for dispensing precise volumes",
+    category: "Measurement",
+    imageUrl: "https://images.unsplash.com/photo-1628595351029-c2bf17511435?w=400&h=300&fit=crop",
+    uses: ["Titrations", "Precise volume delivery", "Quantitative analysis"],
+    safetyNotes: ["Check for leaks", "Ensure tap is closed before filling", "Read at eye level"]
+  },
+  {
+    id: "bunsen-burner",
+    name: "Bunsen Burner",
+    description: "Gas burner producing a single open gas flame used for heating and sterilization",
+    category: "Heating",
+    imageUrl: "https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=400&h=300&fit=crop",
+    uses: ["Heating substances", "Sterilization", "Flame tests"],
+    safetyNotes: ["Tie back hair and loose clothing", "Keep flammables away", "Turn off when not in use"]
+  },
+  {
+    id: "microscope",
+    name: "Compound Microscope",
+    description: "Optical instrument for viewing small specimens at high magnification",
+    category: "Observation",
+    imageUrl: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop",
+    uses: ["Cell observation", "Microorganism study", "Tissue analysis"],
+    safetyNotes: ["Handle lenses carefully", "Clean with proper materials", "Carry with both hands"]
+  },
+  {
+    id: "petri-dish",
+    name: "Petri Dish",
+    description: "Shallow cylindrical lidded dish used to culture cells and microorganisms",
+    category: "Culture",
+    imageUrl: "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=400&h=300&fit=crop",
+    uses: ["Bacterial culture", "Cell culture", "Evaporation"],
+    safetyNotes: ["Sterilize before use", "Seal properly during incubation", "Dispose in biohazard waste"]
+  },
+  {
+    id: "graduated-cylinder",
+    name: "Graduated Cylinder",
+    description: "Tall narrow container with volume markings for measuring liquid volumes",
+    category: "Measurement",
+    imageUrl: "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?w=400&h=300&fit=crop",
+    uses: ["Measuring liquid volumes", "Preparing solutions", "Volume determination"],
+    safetyNotes: ["Read at meniscus level", "Place on flat surface", "Use appropriate size"]
+  },
+  {
+    id: "thermometer",
+    name: "Laboratory Thermometer",
+    description: "Instrument for measuring temperature of liquids and gases",
+    category: "Measurement",
+    imageUrl: "https://images.unsplash.com/photo-1584308972272-9e4e7685e80f?w=400&h=300&fit=crop",
+    uses: ["Temperature monitoring", "Melting point determination", "Reaction monitoring"],
+    safetyNotes: ["Handle carefully to avoid breakage", "Never use for stirring", "Check calibration"]
+  },
+  {
+    id: "centrifuge",
+    name: "Centrifuge",
+    description: "Device that spins samples at high speed to separate components by density",
+    category: "Separation",
+    imageUrl: "https://images.unsplash.com/photo-1583911860205-72f8ac8ddcbe?w=400&h=300&fit=crop",
+    uses: ["Sample separation", "Cell harvesting", "Precipitation"],
+    safetyNotes: ["Balance tubes before use", "Close lid securely", "Wait for complete stop"]
+  },
+  {
+    id: "fume-hood",
+    name: "Fume Hood",
+    description: "Ventilated enclosure for handling hazardous or odorous chemicals safely",
+    category: "Safety Equipment",
+    imageUrl: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&h=300&fit=crop",
+    uses: ["Working with volatile chemicals", "Toxic substance handling", "Reducing exposure"],
+    safetyNotes: ["Keep sash at proper height", "Don't block vents", "Check airflow before use"]
+  }
+];
 
 // Default 12 chemicals that are always visible
 const defaultChemicals = [
@@ -298,28 +411,42 @@ export default function ChemicalViewerPage() {
   return (
     <div className="flex flex-col gap-8">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Chemical Viewer</h1>
-        <p className="text-muted-foreground">Look up detailed information about chemical compounds.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Lab Viewer</h1>
+        <p className="text-muted-foreground">Look up detailed information about chemicals and laboratory equipment.</p>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Chemical Database</CardTitle>
-          <CardDescription>
-            Search for chemicals by name or formula. Results are fetched from PubChem.
-          </CardDescription>
-          <div className="relative pt-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search for a chemical..."
-              className="pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            {isSearching && (
-              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-            )}
-          </div>
-        </CardHeader>
+      
+      <Tabs defaultValue="chemicals" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="chemicals">
+            <FlaskConical className="mr-2 h-4 w-4" />
+            Chemicals
+          </TabsTrigger>
+          <TabsTrigger value="equipment">
+            <Beaker className="mr-2 h-4 w-4" />
+            Equipment
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="chemicals" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Chemical Database</CardTitle>
+              <CardDescription>
+                Search for chemicals by name or formula. Results are fetched from PubChem.
+              </CardDescription>
+              <div className="relative pt-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search for a chemical..."
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {isSearching && (
+                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
+            </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedChemicals.length > 0 ? (
@@ -757,6 +884,75 @@ export default function ChemicalViewerPage() {
           </div>
         </CardContent>
       </Card>
+        </TabsContent>
+        
+        <TabsContent value="equipment" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Laboratory Equipment</CardTitle>
+              <CardDescription>
+                Common laboratory equipment with images, descriptions, and safety guidelines.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {labEquipment.map((item) => (
+                  <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="aspect-video relative bg-muted">
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-2">
+                        <CardTitle className="text-lg">{item.name}</CardTitle>
+                        <Badge variant="outline" className="shrink-0">{item.category}</Badge>
+                      </div>
+                      <CardDescription className="text-sm">
+                        {item.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <Info className="h-4 w-4 text-primary" />
+                          Common Uses
+                        </h4>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          {item.uses.map((use, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-primary mt-1">•</span>
+                              <span>{use}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-orange-500" />
+                          Safety Notes
+                        </h4>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          {item.safetyNotes.map((note, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span className="text-orange-500 mt-1">•</span>
+                              <span>{note}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
