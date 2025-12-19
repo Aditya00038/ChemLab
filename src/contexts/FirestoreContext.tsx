@@ -50,22 +50,19 @@ export type UsageLog = {
   action: 'Used' | 'Checked Out' | 'Returned' | 'Reported Damaged' | 'Inventory Update';
   timestamp: string;
   notes?: string;
-  isTrialMode?: boolean;
 };
 
 type FirestoreContextType = {
   chemicals: Chemical[];
   equipment: Equipment[];
   usageLogs: UsageLog[];
-  isTrialMode: boolean;
-  setIsTrialMode: (value: boolean) => void;
   addChemical: (chemical: Omit<Chemical, 'id'>) => Promise<void>;
   updateChemical: (id: string, chemical: Partial<Chemical>) => Promise<void>;
   deleteChemical: (id: string) => Promise<void>;
   addEquipment: (equip: Omit<Equipment, 'id'>) => Promise<void>;
   updateEquipment: (id: string, equip: Partial<Equipment>) => Promise<void>;
   deleteEquipment: (id: string) => Promise<void>;
-  addUsageLog: (log: Omit<UsageLog, 'id' | 'timestamp' | 'isTrialMode'>) => Promise<void>;
+  addUsageLog: (log: Omit<UsageLog, 'id' | 'timestamp'>) => Promise<void>;
   loading: boolean;
 };
 
@@ -75,34 +72,9 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
   const [chemicals, setChemicals] = useState<Chemical[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [usageLogs, setUsageLogs] = useState<UsageLog[]>([]);
-  const [isTrialMode, setIsTrialMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('trialMode') === 'true';
-    }
-    return false;
-  });
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
-
-  // Update localStorage when trial mode changes
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('trialMode', isTrialMode.toString());
-    }
-  }, [isTrialMode]);
-
-  // Reset trial mode on session end (page unload)
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (isTrialMode) {
-        localStorage.setItem('trialMode', 'false');
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isTrialMode]);
 
   // Listen to Firestore collections
   useEffect(() => {
@@ -164,21 +136,7 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
     };
   }, [user]);
 
-  const showTrialWarning = () => {
-    if (isTrialMode) {
-      toast({
-        title: "Trial Mode Active",
-        description: "Changes are simulated and won't affect real data.",
-        variant: "default",
-      });
-    }
-  };
-
   const addChemical = async (chemical: Omit<Chemical, 'id'>) => {
-    if (isTrialMode) {
-      showTrialWarning();
-      return;
-    }
     try {
       await addDoc(collection(db, 'chemicals'), chemical);
       toast({ title: "Success", description: "Chemical added successfully." });
@@ -189,10 +147,6 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateChemical = async (id: string, chemical: Partial<Chemical>) => {
-    if (isTrialMode) {
-      showTrialWarning();
-      return;
-    }
     try {
       await updateDoc(doc(db, 'chemicals', id), chemical);
       toast({ title: "Success", description: "Chemical updated successfully." });
@@ -203,10 +157,6 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteChemical = async (id: string) => {
-    if (isTrialMode) {
-      showTrialWarning();
-      return;
-    }
     try {
       await deleteDoc(doc(db, 'chemicals', id));
       toast({ title: "Success", description: "Chemical deleted successfully." });
@@ -217,10 +167,6 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addEquipment = async (equip: Omit<Equipment, 'id'>) => {
-    if (isTrialMode) {
-      showTrialWarning();
-      return;
-    }
     try {
       await addDoc(collection(db, 'equipment'), equip);
       toast({ title: "Success", description: "Equipment added successfully." });
@@ -231,10 +177,6 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateEquipment = async (id: string, equip: Partial<Equipment>) => {
-    if (isTrialMode) {
-      showTrialWarning();
-      return;
-    }
     try {
       await updateDoc(doc(db, 'equipment', id), equip);
       toast({ title: "Success", description: "Equipment updated successfully." });
@@ -245,10 +187,6 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteEquipment = async (id: string) => {
-    if (isTrialMode) {
-      showTrialWarning();
-      return;
-    }
     try {
       await deleteDoc(doc(db, 'equipment', id));
       toast({ title: "Success", description: "Equipment deleted successfully." });
@@ -258,19 +196,11 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const addUsageLog = async (log: Omit<UsageLog, 'id' | 'timestamp' | 'isTrialMode'>) => {
+  const addUsageLog = async (log: Omit<UsageLog, 'id' | 'timestamp'>) => {
     const newLog = {
       ...log,
       timestamp: new Date().toISOString(),
-      isTrialMode: isTrialMode,
     };
-
-    if (isTrialMode) {
-      showTrialWarning();
-      // In trial mode, just add to local state temporarily
-      setUsageLogs(prev => [{ id: `trial-${Date.now()}`, ...newLog }, ...prev]);
-      return;
-    }
 
     try {
       await addDoc(collection(db, 'usageLogs'), newLog);
@@ -287,8 +217,6 @@ export function FirestoreProvider({ children }: { children: React.ReactNode }) {
         chemicals,
         equipment,
         usageLogs,
-        isTrialMode,
-        setIsTrialMode,
         addChemical,
         updateChemical,
         deleteChemical,

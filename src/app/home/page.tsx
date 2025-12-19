@@ -1,4 +1,8 @@
+"use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,9 +12,21 @@ import { FloatingIcons } from "@/components/floating-icons";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function HomePage() {
+  const router = useRouter();
+  const { user, loading } = useAuth();
   const dashboardImage = PlaceHolderImages.find(p => p.id === 'dashboard-image');
   const labEquipmentImage = PlaceHolderImages.find(p => p.id === 'lab-equipment-image');
   const shoppingCartImage = PlaceHolderImages.find(p => p.id === 'shopping-cart-image');
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, loading, router]);
+
+  if (loading || user) {
+    return null;
+  }
 
 
   return (
