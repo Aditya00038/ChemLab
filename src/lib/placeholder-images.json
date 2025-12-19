@@ -1,0 +1,40 @@
+{
+  "placeholderImages": [
+    {
+      "id": "home-hero",
+      "description": "A modern laboratory setting for the homepage hero section.",
+      "imageUrl": "https://images.unsplash.com/photo-1614451558153-e4f8fadbbfd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBsYWJvcmF0b3J5fGVufDB8fHx8MTc1OTE2ODExMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "modern laboratory"
+    },
+    {
+      "id": "aaditya-hande",
+      "description": "Profile picture for Aaditya Hande.",
+      "imageUrl": "https://images.unsplash.com/photo-1577333715735-8fcb0359d906?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxtYWxlJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzU5MTI0Mjc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "male portrait"
+    },
+    {
+      "id": "aditya-suryawanshi",
+      "description": "Profile picture for Aditya Suryawanshi.",
+      "imageUrl": "https://images.unsplash.com/photo-1508341591423-4347099e1f19?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtYWxlJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzU5MTI0Mjc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "male portrait"
+    },
+    {
+      "id": "dashboard-image",
+      "description": "An image of an analytics dashboard for the feature spotlight.",
+      "imageUrl": "/media/dashboard_home.png",
+      "imageHint": "analytics dashboard"
+    },
+    {
+      "id": "lab-equipment-image",
+      "description": "An image of laboratory equipment for the feature spotlight.",
+      "imageUrl": "/media/checkout_home.png",
+      "imageHint": "laboratory equipment"
+    },
+    {
+      "id": "shopping-cart-image",
+      "description": "An image representing an online shopping cart for the feature spotlight.",
+      "imageUrl": "/media/shopping_cart.png",
+      "imageHint": "online shopping"
+    }
+  ]
+}

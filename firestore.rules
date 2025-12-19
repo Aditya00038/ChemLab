@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        request.auth.token.email in [
+          'adityasuryawanshi038@gmail.com',
+          'aadityahande27@gmail.com'
+        ];
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Chemicals collection - Read for all auth users, Write for admins only
+    match /chemicals/{chemicalId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Equipment collection - Read for all auth users, Write for admins only
+    match /equipment/{equipmentId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Usage logs - Read for all, Create for auth users, No updates/deletes (audit trail)
+    match /usageLogs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Immutable logs for audit
+    }
+    
+    // User profiles - Users can only read/write their own profile
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId);
+      allow delete: if false; // Prevent profile deletion
+    }
+    
+    // Admin audit logs - Only admins can read, system creates
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false; // Immutable audit trail
+    }
+    
+    // Cart items - Users can only access their own cart
+    match /carts/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
